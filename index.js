@@ -40,19 +40,27 @@ io.on('connection', socket => {
                 var color1 = partie.tourj1 ? 'red' : 'green';
                 var color2 = partie.tourj1 ? 'green' : 'red';
             
-                CONNEXION.forEach(user => {
-                    if(partie.j1Name == user.name){
-                        user.socket.emit('rcvplay', {x:data.x, y:data.y, color:color2});
-                    } else if( partie.j2Name == user.name ){
-                        user.socket.emit('rcvplay', {x:data.x, y:data.y, color:color1});
-                    }
-                });
+                
 
                 partie.plateau[data.y-1][data.x-1]= (partie.tourj1) ? 1 : 2;
                 partie.tourj1 = !partie.tourj1;
-                if(isEnd(partie.plateau)){
-                    partie.end=true;
-                }
+                
+
+                CONNEXION.forEach(user => {
+                    if(partie.j1Name == user.name){
+                        user.socket.emit('rcvplay', {x:data.x, y:data.y, color:color2});
+                        if(isEnd(partie.plateau)){
+                            partie.end=true;
+                            user.socket.emit('end','Plateau Remplie');
+                        }
+                    } else if( partie.j2Name == user.name ){
+                        user.socket.emit('rcvplay', {x:data.x, y:data.y, color:color1});
+                        if(isEnd(partie.plateau)){
+                            partie.end=true;
+                            user.socket.emit('end','Plateau Remplie');
+                        }
+                    }
+                });
             }
         }
     });

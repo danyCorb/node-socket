@@ -19,6 +19,7 @@
     </style>
  
     <body>
+        <div id="messageDiv"></div>
         <table>
             <tr id="r1">
                 <td id="d1-1"></td>
@@ -78,6 +79,12 @@
                     }
                 }
             });
+
+            socket.on('end', (data)=>{
+                document.getElementById("messageDiv").innerHTML = data;
+                
+            });
+
             socket.emit('tellLoadPlat', null);
 
 
