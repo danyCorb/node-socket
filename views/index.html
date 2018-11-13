@@ -2,91 +2,35 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Socket.io</title>
+        <title>Connexion.io</title>
     </head>
-    <style>
-        td{
-            height: 15vh;
-            width: 15vh;
-            border: 1px solid #888;
-        }
-        .red {
-            background-color: red;
-        }
-        .green {
-            background-color: green;
-        }
-    </style>
  
     <body>
         <input id='id_client' name='id_client' type='text'/>
-        <input type="button" onclick="updateId()" value="set/update ID"/>
-        <table>
-            <tr id="r1">
-                <td id="d1-1"></td>
-                <td id="d1-2"></td>
-                <td id="d1-3"></td>
-            </tr>
-            <tr id="r2">
-                <td id="d2-1"></td>
-                <td id="d2-2"></td>
-                <td id="d2-3"></td>
-            </tr>
-            <tr id="r3">
-                <td id="d3-1"></td>
-                <td id="d3-2"></td>
-                <td id="d3-3"></td>
-            </tr>
-        </table>
+        <input type="button" onclick="connexion()" value="Connexion"/>
+        <h2>Votre nom : <span id="player-name"></span></h2>
+        <h3 id="message-response"></h3>
+        <a href="/jeu" hidden="true" id="randomBattleLink">Random battle</a>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
             var socket = io();
 
-            for(j=1;j<4;j++){
-                for(k=1;k<4;k++){
-                    var selector = "d"+j+"-"+k;
-                    let x=k;
-                    let y=j;
-                    document.getElementById(selector).addEventListener('click',(event) => {playCoup(event, x, y)});
+            socket.on('connexionResponse', (data) => {
+                if(data.connected){
+                    document.getElementById("player-name").innerHTML = data.name;
+                    document.getElementById("randomBattleLink").removeAttribute('hidden');
+                } else {
+                    document.getElementById("player-name").innerHTML = data.name;
+                    document.getElementById("randomBattleLink").setAttribute('hidden','true');
                 }
-            }
-
-            function playCoup(event, x, y){
-                if(event.target.className==''){
-                    id = document.getElementById("id_client").value;
-                    socket.emit('play', {x:x, y:y, id:id});
-                    console.log("play to "+x+' '+y);
-                }
-            }
-
-            
-            socket.on('rcvplay', (data) => { 
-                color = data.color;
-                x = data.x;
-                y = data.y;
-                var selector = "d"+y+"-"+x;
-                document.getElementById(selector).className = color;
+                document.getElementById("message-response").innerHTML = data.message;
+                
             });
 
-            socket.on('loadPlat', (data) => {
-                for(j=0;j<3;j++){
-                    for(k=0;k<3;k++){
-                        var selector = "d"+(j+1)+"-"+(k+1);
-                        if(data[j][k]==1){
-                            document.getElementById(selector).className = 'red';
-                        } else if(data[j][k]==2){
-                            document.getElementById(selector).className = 'green';
-                        }
-                    }
-                }
-            });
-
-            function updateId(){
-                socket.emit('setId', document.getElementById("id_client").value);
+            function connexion(){
+                socket.emit('connexion', {name:document.getElementById("id_client").value});
             }
-
-            socket.emit('tellLoadPlat', null);
 
 
         </script>
