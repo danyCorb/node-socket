@@ -1,0 +1,23 @@
+{
+  "name": "danytchat",
+  "version": "0.0.1",
+  "description": "tchat test socket io",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danyCorb/node-socket.git"
+  },
+  "author": "dany corbineau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danyCorb/node-socket/issues"
+  },
+  "homepage": "https://github.com/danyCorb/node-socket#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.1.1"
+  }
+}
