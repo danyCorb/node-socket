@@ -9,20 +9,14 @@ const session = require("express-session")({
 const sharedsession = require("express-socket.io-session");
 
 
-/*var partie = {
-    j1Name: null,
-    j2Name: null,
-    plateau: [[0,0,0],[0,0,0],[0,0,0]],
-    tourj1: true,
-    end:false
-}*/
-
 const parties = [];
 
 var CONNEXION = [
     {name: 'coco', socket: null },
     {name: 'dd', socket: null },
-    {name: 'pp', socket: null }
+    {name: 'pp', socket: null },
+    {name: 'tt', socket: null },
+    {name: 'mm', socket: null }
 ]
 
 var players = [];
@@ -53,11 +47,12 @@ io.on('connection', socket => {
                         user.socket.emit('rcvplay', {x:data.x, y:data.y, color:color1});
                     }
                 });
-                console.log('play on '+data.x+' '+data.y);
-                /** TODO debug coup */
 
                 partie.plateau[data.y-1][data.x-1]= (partie.tourj1) ? 1 : 2;
                 partie.tourj1 = !partie.tourj1;
+                if(isEnd(partie.plateau)){
+                    partie.end=true;
+                }
             }
         }
     });
@@ -75,9 +70,9 @@ io.on('connection', socket => {
             if( parties.length>0 && !parties[parties.length-1].j2Name){
                 parties[parties.length-1].j2Name = socket.handshake.session.user_name;
                 socket.emit('loadPlat', parties[parties.length-1].plateau);
-                console.log('user add to game');
+                console.log('user add to game#'+ socket.handshake.session.user_name +"#");
             } else {
-                console.log('create part');
+                console.log('create part#'+ socket.handshake.session.user_name +"#");
                 var partie = {
                     j1Name: socket.handshake.session.user_name,
                     j2Name: null,
@@ -90,6 +85,12 @@ io.on('connection', socket => {
             }
         }
     });
+
+    socket.on('reload', (data) => {
+        var partie = getCurentGame(socket.handshake.session.user_name);
+        if(partie)
+            socket.emit('loadPlat', partie.plateau);
+    })
 
     socket.on('connexion',(data) => {
         var name = data.name;
@@ -131,4 +132,15 @@ function getCurentGame(user_name){
         }
     });
     return returnV;
+}
+
+function isEnd(plateau){
+    for(j=0;j<3;j++){
+        for(k=0;k<3;k++){
+            if(plateau[j][k]==0){
+                return false;
+            }
+        }
+    }
+    return true;
 }
